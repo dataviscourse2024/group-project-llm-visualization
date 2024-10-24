@@ -2,7 +2,6 @@
 import Nav from './components/Nav.vue';
 import LLMSidebar from './components/LLMSidebar.vue';
 import VisContainer from './components/VisContainer.vue';
-
 </script>
 
 <template>
@@ -16,5 +15,4 @@ import VisContainer from './components/VisContainer.vue';
 </template>
 
 <style scoped>
-
 </style>
