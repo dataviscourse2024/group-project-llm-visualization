@@ -1,11 +1,5 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col>
-        <div ref="chart"></div>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div ref="chart" class="chart"></div>
 </template>
 
 <script>
@@ -37,8 +31,8 @@ export default defineComponent({
   methods: {
     drawChart() {
       const margin = { top: 20, right: 30, bottom: 30, left: 40 };
-      const width = 800 - margin.left - margin.right;
-      const height = 400 - margin.top - margin.bottom;
+      const width = this.$refs.chart.clientWidth - margin.left - margin.right;
+      const height = this.$refs.chart.clientHeight - margin.top - margin.bottom;
 
       const svg = d3.select(this.$refs.chart)
         .append('svg')

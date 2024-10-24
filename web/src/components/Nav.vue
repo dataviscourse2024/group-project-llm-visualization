@@ -11,6 +11,7 @@ const items = [
 <template>
   <v-navigation-drawer
     v-model="open"
+    app
   >
     <v-list
       :items="items"
