@@ -1,1 +1,1 @@
-{"root":["./src/main.ts","./src/vite-env.d.ts","./src/plugins/vuetify.ts","./src/app.vue","./src/components/main.vue"],"errors":true,"version":"5.6.3"}
+{"root":["./src/main.ts","./src/vite-env.d.ts","./src/plugins/vuetify.ts","./src/app.vue","./src/components/llmsidebar.vue","./src/components/nav.vue","./src/components/viscontainer.vue","./src/components/visualizations/linechart.vue"],"errors":true,"version":"5.6.3"}
