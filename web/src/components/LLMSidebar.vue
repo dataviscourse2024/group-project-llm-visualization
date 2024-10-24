@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const open = ref(true);
+const open = ref(false);
 </script>
 
 <template>
@@ -9,7 +9,6 @@ const open = ref(true);
     v-model="open"
     app
     location="right"
-    temporary
   >
     WORK IN PROGRESS!!
   </v-navigation-drawer>

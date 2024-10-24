@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const open = ref(true);
+const open = ref(false);
 
 const items = [
   "Test", "Test 2", "Test 3"
