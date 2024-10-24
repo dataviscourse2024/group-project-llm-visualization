@@ -29,13 +29,14 @@ const open = ref(false);
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: 0;
+    right: -5px;
     max-width: 32px;
     min-height: 64px;
-    background-color: white;
+    background-color: --var(--v-theme-background);
     border: 1px solid #ccc;
     border-radius: 4px;
     z-index: 0;
+    transition: all 0.2s;
   }
   .toggle-btn.open {
     right: 250px;
