@@ -2,6 +2,7 @@
 import Nav from './components/Nav.vue';
 import LLMSidebar from './components/LLMSidebar.vue';
 import VisContainer from './components/VisContainer.vue';
+import FetchButton from './components/FetchButton.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import VisContainer from './components/VisContainer.vue';
       <Nav />
       <LLMSidebar />
       <VisContainer />
+      <FetchButton />
     </v-main>
   </v-app>
 </template>
