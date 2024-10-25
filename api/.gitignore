@@ -1,2 +1,1 @@
-# json files might be saved during testing
-*.json
+__pycache__
