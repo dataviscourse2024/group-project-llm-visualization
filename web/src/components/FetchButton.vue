@@ -48,6 +48,6 @@ const fetchData = async () => {
 
 .btn-large {
   font-size: 1.25rem;
-  padding: 12px 24px;
+  padding: 6px 24px;
 }
 </style>

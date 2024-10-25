@@ -75,8 +75,8 @@ const drawChart = () => {
     .attr('class', 'tooltip')
     .style('opacity', 0)
     .style('position', 'absolute')
-    .style('background', 'rgba(255, 255, 255, 0.9)')
-    .style('padding', '8px')
+    .style('padding', '10px')
+    .style('font-weight', 'bold')
     .style('border', '1px solid #ccc')
     .style('border-radius', '4px');
 

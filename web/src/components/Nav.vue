@@ -50,7 +50,7 @@ const toggleTheme = async () => {
     background-color: --var(--v-theme-background);
     border: 1px solid #ccc;
     border-radius: 4px;
-    z-index: 1; /* Ensure it appears above the drawer */
+    z-index: 1;
     transition: all 0.2s;
   }
   .toggle-btn.open {

@@ -3,7 +3,7 @@
     <v-container fluid class="fill-height">
       <v-row class="fill-height">
         <v-col class="chart-container">
-          <LineChart :data="chartData" /> <!-- Pass data as a prop -->
+          <LineChart :data="chartData" />
         </v-col>
       </v-row>
       <FetchButton @data-fetched="updateChartData" /> <!-- Listen for data-fetched -->
