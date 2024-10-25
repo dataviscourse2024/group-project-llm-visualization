@@ -1,49 +1,53 @@
 <template>
-  <v-row justify="center" class="mt-4">
-    <v-col cols="auto">
-      <v-btn class="btn-large" color="primary" @click="sendPostRequest">Fetch Earthquake Data</v-btn>
-    </v-col>
-    
-    <!-- Display the response -->
-    <v-col v-if="response" class="mt-2">
-      <h3>Response:</h3>
-      <pre>{{ response }}</pre>
-    </v-col>
+  <div class="inputs-container">
+    <label for="start-time">Start Time:</label>
+    <input type="datetime-local" id="start-time" v-model="startTime" />
 
-    <!-- Display any errors -->
-    <v-col v-if="error" class="mt-2">
-      <h3>Errors:</h3>
-      <pre>{{ error }}</pre>
-    </v-col>
-  </v-row>
+    <label for="end-time">End Time:</label>
+    <input type="datetime-local" id="end-time" v-model="endTime" />
+
+    <v-btn class="btn-large" color="primary" @click="fetchData">Fetch Earthquake Data</v-btn>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
 import axios from 'axios';
 
-const response = ref(null);
-const error = ref(null);
+const emit = defineEmits(['dataFetched']);
+const startTime = ref('');
+const endTime = ref('');
 
-const sendPostRequest = async () => {
+const fetchData = async () => {
   try {
+    if (!startTime.value || !endTime.value) {
+      alert('Please provide both start and end times');
+      return;
+    }
+
     const data = {
-      start_time: "2024-05-23T00:00:00",
-      end_time: "2024-09-23T00:00:00"
+      start_time: startTime.value,
+      end_time: endTime.value
     };
 
     const result = await axios.post('http://127.0.0.1:8000/get_data', data);
-    response.value = result.data;
-    error.value = null;
-  } catch (err) {
-    error.value = err.response ? err.response.data : err.message;
+    emit('dataFetched', result.data.features);
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
   }
 };
 </script>
 
 <style scoped>
+.inputs-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
 .btn-large {
   font-size: 1.25rem;
-  padding: 12px 24px; 
+  padding: 12px 24px;
 }
 </style>

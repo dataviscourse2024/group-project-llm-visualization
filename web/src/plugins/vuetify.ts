@@ -7,7 +7,4 @@ import 'vuetify/styles';
 export default createVuetify({
   components,
   directives,
-  theme: {
-    defaultTheme: 'light',
-  },
 });

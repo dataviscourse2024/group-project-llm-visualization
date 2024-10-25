@@ -54,7 +54,7 @@ const toggleTheme = async () => {
     transition: all 0.2s;
   }
   .toggle-btn.open {
-    left: 250px; /* Adjust this value based on the width of your navigation drawer */
+    left: 250px; 
   }
   
 </style>
