@@ -1,30 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useTheme } from 'vuetify'
 
 const open = ref(false);
-const theme = useTheme();
-
-const toggleTheme = async () => {
-  theme.global.name.value = theme.global.name.value === 'light' ? 'dark' : 'light';
-};
-
 </script>
 
 <template>
   <v-navigation-drawer
     v-model="open"
     app
+    location="right"
   >
-    <v-switch
-      @change="toggleTheme"
-      class="theme-toggle-switch d-flex justify-center"
-      label="Toggle theme"
-    >
-      <template v-slot:label>
-        <v-icon right>mdi-weather-night</v-icon>
-      </template>
-    </v-switch>
+    WORK IN PROGRESS!!
   </v-navigation-drawer>
   <v-btn
     :class="[ 'toggle-btn', open ? 'open' : '' ]"
@@ -32,11 +18,10 @@ const toggleTheme = async () => {
     icon
   >
     <v-icon
-      :icon="open ? 'mdi-chevron-left' : 'mdi-chevron-right'"
+      :icon="open ? 'mdi-chevron-right' : 'mdi-chevron-left'"
       size="large"
     ></v-icon>
   </v-btn>
-
 </template>
 
 <style scoped>
@@ -44,17 +29,16 @@ const toggleTheme = async () => {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: -5px; /* Change from right to left */
+    right: -5px;
     max-width: 32px;
     min-height: 64px;
     background-color: --var(--v-theme-background);
     border: 1px solid #ccc;
     border-radius: 4px;
-    z-index: 1; /* Ensure it appears above the drawer */
+    z-index: 0;
     transition: all 0.2s;
   }
   .toggle-btn.open {
-    left: 250px; 
+    right: 250px;
   }
-  
 </style>

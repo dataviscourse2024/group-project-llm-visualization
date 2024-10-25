@@ -1,0 +1,2 @@
+# json files might be saved during testing
+*.json
