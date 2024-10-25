@@ -12,24 +12,56 @@ export default defineComponent({
   name: 'LineChart',
   data() {
     return {
-      data: [
-        { date: new Date(2023, 0, 1), value: 30 },
-        { date: new Date(2023, 1, 1), value: 50 },
-        { date: new Date(2023, 2, 1), value: 80 },
-        { date: new Date(2023, 3, 1), value: 65 },
-        { date: new Date(2023, 4, 1), value: 95 }, 
-        { date: new Date(2023, 5, 1), value: 70 },
-        { date: new Date(2023, 6, 1), value: 85 },
-        { date: new Date(2023, 7, 1), value: 60 },
-        { date: new Date(2023, 8, 1), value: 75 },
-        { date: new Date(2023, 9, 1), value: 90 },
-        { date: new Date(2023, 10, 1), value: 100 },
-        { date: new Date(2023, 11, 1), value: 110 },
-      ],
+      // data: [
+      //   { date: new Date(2023, 0, 1), value: 30 },
+      //   { date: new Date(2023, 1, 1), value: 50 },
+      //   { date: new Date(2023, 2, 1), value: 80 },
+      //   { date: new Date(2023, 3, 1), value: 65 },
+      //   { date: new Date(2023, 4, 1), value: 95 }, 
+      //   { date: new Date(2023, 5, 1), value: 70 },
+      //   { date: new Date(2023, 6, 1), value: 85 },
+      //   { date: new Date(2023, 7, 1), value: 60 },
+      //   { date: new Date(2023, 8, 1), value: 75 },
+      //   { date: new Date(2023, 9, 1), value: 90 },
+      //   { date: new Date(2023, 10, 1), value: 100 },
+      //   { date: new Date(2023, 11, 1), value: 110 },
+      // ],
+      data: []
     };
   },
   mounted() {
-    this.drawChart();
+    // this.drawChart();
+    d3.csv('./data/query.csv').then(dataOutput => {
+      const dataResult = dataOutput.map(d => ({
+        time: d3.timeFormat('%Y-%m-%d')(d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(d.time))
+      }));
+
+      const dateCounts = {};
+
+      dataOutput.forEach(d => {
+        const parsedDate = d3.timeFormat('%Y-%m-%d')(d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(d.time));
+        if (dateCounts[parsedDate]) {
+          dateCounts[parsedDate]++;
+        } else {
+          dateCounts[parsedDate] = 1;
+        }
+      });
+
+      const dataArray = Object.keys(dateCounts).map(date => ({
+        date: new Date(date),
+        value: dateCounts[date],
+      }));
+
+      this.data = dataArray;
+
+      this.drawChart();
+
+      // console.log(dataResult);
+      // console.log(dateCounts);
+      // console.log(dataArray);
+    }).catch(error => {
+      console.error('Error loading the CSV data:', error);
+    });
   },
   methods: {
     drawChart() {
