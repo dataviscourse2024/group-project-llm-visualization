@@ -30,7 +30,7 @@ const fetchData = async () => {
       end_time: endTime.value
     };
 
-    const result = await axios.post('http://127.0.0.1:80/get_data', data);
+    const result = await axios.post('http://0.0.0.0:80/get_data', data);
     emit('dataFetched', result.data.features);
   } catch (error) {
     console.error("Failed to fetch data:", error);
