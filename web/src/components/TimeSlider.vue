@@ -88,6 +88,16 @@ function createChart() {
     .attr('class', 'brush')
     .call(brush);
 
+
+  // Add the x-axis
+  const xAxis = d3.axisBottom(x)
+    .ticks(d3.timeYear.every(1))
+    .tickFormat(d3.timeFormat('%Y'));
+
+  svgElement.append('g')
+    .attr('transform', `translate(0,${height})`)
+    .call(xAxis);
+
   function brushed(event: any) {
     if (event.selection) {
       const [x0, x1] = event.selection.map(x.invert);
