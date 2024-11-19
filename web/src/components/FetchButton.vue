@@ -44,6 +44,7 @@ const fetchData = async () => {
   align-items: center;
   gap: 10px;
   margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .btn-large {
