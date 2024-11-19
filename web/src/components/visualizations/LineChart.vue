@@ -7,6 +7,7 @@
           <th>Date</th>
           <th>Magnitude</th>
           <th>Location</th>
+          <th>Time</th>
         </tr>
       </thead>
       <tbody>
@@ -14,6 +15,7 @@
           <td>{{ formatDate(data.time) }}</td>
           <td>{{ data.magnitude }}</td>
           <td>{{ data.location }}</td>
+          <td>{{ formatTime(data.time) }}</td>
         </tr>
       </tbody>
     </table>
@@ -31,6 +33,7 @@ const props = defineProps({
 const chart = ref(null);
 const selectedData = reactive([]);
 const formatDate = (time) => d3.timeFormat("%B %d, %Y")(new Date(time));
+const formatTime = (time) => d3.timeFormat("%I:%M %p")(new Date(time));
 const reversedSelectedData = computed(() => [...selectedData].reverse());
 
 const drawChart = () => {
@@ -102,7 +105,7 @@ const drawChart = () => {
     .style('border', '1px solid #ccc')
     .style('border-radius', '4px');
 
-  const brush = d3.brush()
+  const brush = d3.brushX()
     .extent([[0, 0], [width, height]])
     .on('end', brushed);
   
@@ -120,7 +123,7 @@ const drawChart = () => {
     .attr('fill', 'steelblue')
     .on('mouseover', (event, d) => {
       tooltip.transition().duration(200).style('opacity', 1);
-      tooltip.html(`Date: ${formatDate(d.time)}<br>Magnitude: ${d.magnitude}<br>Title: ${d.location}`)
+      tooltip.html(`Date: ${formatDate(d.time)}<br>Magnitude: ${d.magnitude}<br>Title: ${d.location}<br>Time: ${formatTime(d.time)}`)
         .style('left', `${event.pageX + 10}px`)
         .style('top', `${event.pageY - 28}px`);
       d3.select(event.currentTarget).attr('fill', 'orange');
@@ -142,11 +145,10 @@ const drawChart = () => {
       selectedData.splice(0, selectedData.length); // Clear the table when brush is out of focus
       return;
     }
-    const [[x0, y0], [x1, y1]] = event.selection;
+    const [x0, x1] = event.selection.map(x.invert);
     const brushedData = props.data.filter(d => {
-      const cx = x(new Date(d.time));
-      const cy = y(d.magnitude);
-      return cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+      const time = new Date(d.time);
+      return time >= x0 && time <= x1;
     });
     selectedData.splice(0, selectedData.length, ...brushedData);
   }
