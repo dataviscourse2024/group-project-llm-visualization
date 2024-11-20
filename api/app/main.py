@@ -1,9 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from urllib.request import urlopen 
+from urllib.request import urlopen
 import json
 import datetime
 from pydantic import BaseModel
+import requests
+import logging
 
 app = FastAPI()
 
@@ -17,6 +20,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # ISO 8601 format (e.g., "2024-05-23T00:00:00")
 # {
@@ -33,37 +37,43 @@ def get_earthquake_data(url):
         data = response.read()
         return json.loads(data)
 
+
 def filter(json_data):
-    filtered_data = {
-        "count": json_data["metadata"]["count"],
-        "features": []    
-    }
+    filtered_data = {"count": json_data["metadata"]["count"], "features": []}
     print("Filtering data...")
-    for id_, feature in enumerate(json_data["features"]):        
-        filtered_data["features"].append({
-            "id": id_,
-            "type": feature["properties"]["type"].lower(),
-            "magnitude": feature["properties"]["mag"],
-            "location": feature["properties"]["place"],
-            "time": datetime.datetime.utcfromtimestamp(feature["properties"]["time"] / 1000),
-            "felt": feature["properties"]["felt"],
-            "cdi": feature["properties"]["cdi"],
-            "mmi": feature["properties"]["mmi"],
-            "sig": feature["properties"]["sig"],
-            "nst": feature["properties"]["nst"],
-            "rms": feature["properties"]["rms"],
-            "dmin": feature["properties"]["dmin"],
-            "gap": feature["properties"]["gap"] # TODO: Implement caching or pagination for larger datasets.
-        })
+    for id_, feature in enumerate(json_data["features"]):
+        filtered_data["features"].append(
+            {
+                "id": id_,
+                "type": feature["properties"]["type"].lower(),
+                "magnitude": feature["properties"]["mag"],
+                "location": feature["properties"]["place"],
+                "time": datetime.datetime.utcfromtimestamp(
+                    feature["properties"]["time"] / 1000
+                ),
+                "felt": feature["properties"]["felt"],
+                "cdi": feature["properties"]["cdi"],
+                "mmi": feature["properties"]["mmi"],
+                "sig": feature["properties"]["sig"],
+                "nst": feature["properties"]["nst"],
+                "rms": feature["properties"]["rms"],
+                "dmin": feature["properties"]["dmin"],
+                "gap": feature["properties"][
+                    "gap"
+                ],  # TODO: Implement caching or pagination for larger datasets.
+            }
+        )
     return filtered_data
+
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World" }
+    return {"message": "Hello World"}
+
 
 @app.get("/data_all")
 async def data_all():
-    start_time = "2024-05-23%2000:00:00"  
+    start_time = "2024-05-23%2000:00:00"
     end_time = "2024-10-23%2000:00:00"
     q_str = f"https://earthquake.usgs.gov/fdsnws/event/1/query.geojson?starttime={start_time}&endtime={end_time}&maxlatitude=42.003&minlatitude=37.006&maxlongitude=-109.05&minlongitude=-114.038&minmagnitude=2.5&orderby=time"
     res = get_earthquake_data(q_str)
@@ -74,6 +84,7 @@ async def data_all():
         # return res
     else:
         return {"error": res["metadata"]["message"]}
+
 
 @app.post("/get_data")
 async def get_data(timestamp: TimeStamp):
@@ -94,3 +105,83 @@ async def get_data(timestamp: TimeStamp):
         # return res
     else:
         return {"error": res["metadata"]["message"]}
+
+
+html = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            var ws = new WebSocket("ws://localhost:80/generate");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+        </script>
+    </body>
+</html>
+"""
+
+
+@app.get("/html")
+async def get():
+    return HTMLResponse(html)
+
+
+def generate_response(prompt: str):
+    url = "http://host.docker.internal:11434/api/generate"
+    payload = {
+        "model": "llama3.2:1b-instruct-q4_0",
+        "prompt": prompt
+    }
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
+        return response.text.strip()
+    except requests.exceptions.Timeout:
+        return "Error: Request timed out"
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error interacting with LLM API: {e}")
+        return f"Error: {e}"
+
+
+@app.websocket("/generate")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    logging.info("WebSocket connection accepted")
+    try:
+        while True:
+            # Receive message from the client
+            prompt = await websocket.receive_text()
+            logging.info(f"Received prompt: {prompt}")
+
+            # Generate response from the LLM
+            response = generate_response(prompt)
+            
+            # Send the response back to the client
+            await websocket.send_text(response)
+    except WebSocketDisconnect:
+        logging.info("WebSocket connection closed")
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        await websocket.send_text(f"Error: {e}")
+        await websocket.close()
