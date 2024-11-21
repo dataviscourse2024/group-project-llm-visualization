@@ -3,9 +3,9 @@
     <v-container class="fill-height">
       <v-col class="chart-container">
         <v-row class="fill-height">
-          <LineChart :data="filteredChartData" />
+          <component :is="currentViewComponent" :data="filteredChartData" />
         </v-row>
-        <v-row>
+        <v-row v-if="currentView.value === 'lineChart'">
           <TimeSlider :data="chartData" @updateWindow="updateWindow" />
         </v-row>
         <v-row>
@@ -24,12 +24,18 @@
 
 <script setup lang="ts">
 import LineChart from './visualizations/LineChart.vue';
+import Map from './visualizations/Map.vue';
 import FetchButton from './FetchButton.vue';
 import TimeSlider from './TimeSlider.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { currentView } from './state'; // Import the global ref
 
 const chartData = ref([]);
 const filteredChartData = ref([]);
+
+const currentViewComponent = computed(() => {
+  return currentView.value === 'lineChart' ? LineChart : Map;
+});
 
 const updateChartData = (data) => {
   chartData.value = data;
