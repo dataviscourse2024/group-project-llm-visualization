@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { onMounted, watch, ref, reactive, computed } from 'vue';
 import * as d3 from 'd3';
+import { currentSelection } from '../../store';
 
 const props = defineProps({
   data: Array,
@@ -98,7 +99,7 @@ const drawChart = () => {
     .select(chart.value)
     .append('div')
     .attr('class', 'tooltip')
-    .style('opacity', 0)
+    .style('background', 'rgba(255,255,255,0.7)')
     .style('position', 'absolute')
     .style('padding', '10px')
     .style('font-weight', 'bold')
@@ -113,14 +114,13 @@ const drawChart = () => {
     .attr('class', 'brush')
     .call(brush);
 
-  svg.selectAll('circle')
+  svg.selectAll('path')
     .data(props.data)
     .enter()
-    .append('circle')
-    .attr('cx', (d) => x(new Date(d.time)))
-    .attr('cy', (d) => y(d.magnitude))
-    .attr('r', 5)
-    .attr('fill', 'steelblue')
+    .append('path')
+    .attr('d', d3.symbol().type(d => d.type === 'earthquake' ? d3.symbolCircle : d3.symbolTriangle).size(100))
+    .attr('transform', d => `translate(${x(new Date(d.time))},${y(d.magnitude)})`)
+    .attr('fill', d => d.type === 'earthquake' ? 'steelblue' : 'green')
     .on('mouseover', (event, d) => {
       tooltip.transition().duration(200).style('opacity', 1);
       tooltip.html(`Date: ${formatDate(d.time)}<br>Magnitude: ${d.magnitude}<br>Title: ${d.location}<br>Time: ${formatTime(d.time)}`)
@@ -128,10 +128,40 @@ const drawChart = () => {
         .style('top', `${event.pageY - 28}px`);
       d3.select(event.currentTarget).attr('fill', 'orange');
     })
-    .on('mouseout', function () {
+    .on('mouseout', function (event, d) {
       tooltip.transition().duration(500).style('opacity', 0);
-      d3.select(this).attr('fill', 'steelblue');
+      d3.select(this).attr('fill', d.type === 'earthquake' ? 'steelblue' : 'green');
     });
+
+
+    const legend = svg.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(${width - 100},${margin.top})`);
+
+    legend.append('circle')
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', 5)
+      .attr('fill', 'steelblue');
+
+    legend.append('text')
+      .attr('x', 10)
+      .attr('y', 5)
+      .text('Earthquake')
+      .style('font-size', '12px')
+      .attr('alignment-baseline', 'middle');
+
+    legend.append('path')
+      .attr('d', d3.symbol().type(d3.symbolTriangle).size(100))
+      .attr('transform', 'translate(0, 20)')
+      .attr('fill', 'green');
+
+    legend.append('text')
+      .attr('x', 10)
+      .attr('y', 25)
+      .text('Mining Explosion')
+      .style('font-size', '12px')
+      .attr('alignment-baseline', 'middle');
 
   d3.select(chart.value)
     .on('click', function (event) {
@@ -151,6 +181,7 @@ const drawChart = () => {
       return time >= x0 && time <= x1;
     });
     selectedData.splice(0, selectedData.length, ...brushedData);
+    currentSelection.value = selectedData;
   }
 };
 

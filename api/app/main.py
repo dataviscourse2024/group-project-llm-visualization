@@ -102,7 +102,7 @@ async def get_data(timestamp: TimeStamp):
     if res["metadata"]["status"] == 200:
         print("successfully scraped data")
         filtered_data = filter(res)
-        #print(filtered_data)
+        # print(filtered_data)
         return filtered_data
         # return res
     else:
@@ -153,10 +153,11 @@ def generate_response(prompt: str):
     url = "http://host.docker.internal:11434/api/generate"
     payload = {
         "model": "llama3.2:1b-instruct-q4_0",
-        "prompt": prompt
+        "system": "You are a geological expert on Earthquakes. Your goal is to provide assistance to high school level students about their interactions and selections with earthquake data in the state of Utah, United States. Respond with a maximum of only two sentences. Use the JSON format input data provided in the selections and avoid synthesis of new data unless it is directly derived from the provided data. Respond only in plaintext.",
+        "prompt": prompt,
     }
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        response = requests.post(url, json=payload, timeout=100)
         response.raise_for_status()
         return response.text.strip()
     except requests.exceptions.Timeout:
@@ -178,7 +179,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Generate response from the LLM
             response = generate_response(prompt)
-            
+
             # Send the response back to the client
             await websocket.send_text(response)
     except WebSocketDisconnect:

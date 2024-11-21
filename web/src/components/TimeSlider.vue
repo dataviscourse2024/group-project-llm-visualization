@@ -101,7 +101,11 @@ function createChart() {
   function brushed(event: any) {
     if (event.selection) {
       const [x0, x1] = event.selection.map(x.invert);
-      emits('updateWindow', { start: x0, end: x1 });
+      const [startIndex, endIndex] = [
+        d3.bisector((d: any) => new Date(d.time)).left(props.data, x0),
+        d3.bisector((d: any) => new Date(d.time)).left(props.data, x1)
+      ];
+      emits('updateWindow', { start: x0, end: x1, indexRange: [startIndex, endIndex] });
     }
   }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { currentSelection } from '../store';
 
 const open = ref(false);
 const userMessages = ref<{ [date: number]: string }>({});
@@ -44,6 +45,9 @@ async function initializeWebSocket() {
     .join("");
     
     llmMessages.value[time] = msg;
+
+    responseLoading.value = false;
+
     scrollChatBox();
   };
 
@@ -61,6 +65,7 @@ async function initializeWebSocket() {
 async function sendMessage() {
   if (newMessage.value.trim() !== '') {
     const m = newMessage.value;
+
     newMessage.value = '';
     userMessages.value[Date.now()] = m;
     scrollChatBox();
@@ -69,15 +74,16 @@ async function sendMessage() {
 
     try {
       if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.send(m);
+      console.log(currentSelection.value);
+      const dataToSend = m + "\n" + "SELECTION:" + JSON.stringify(currentSelection.value);
+
+      websocket.send(dataToSend);
       } else {
         throw new Error('WebSocket is not connected');
       }
     } catch (error) {
       console.error('Failed to send message:', error);
       llmMessages.value[Date.now()] = 'Failed to send message to server.';
-    } finally {
-      responseLoading.value = false;
     }
   }
 }
