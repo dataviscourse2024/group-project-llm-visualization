@@ -95,9 +95,7 @@ const drawChart = () => {
     .attr('stroke-width', 2)
     .attr('d', line);
 
-  const tooltip = d3
-    .select(chart.value)
-    .append('div')
+  const tooltip = d3.select(chart.value).append('div')
     .attr('class', 'tooltip')
     .style('background', 'rgba(255,255,255,0.7)')
     .style('position', 'absolute')
@@ -220,8 +218,12 @@ th, td {
 }
 
 th {
+  background-color: var(--background);
   border: 1px solid #ddd;
   text-align: left;
+  position: sticky;
+  top: 0;
+  color: var(--text-color);
 }
 
 thead {
