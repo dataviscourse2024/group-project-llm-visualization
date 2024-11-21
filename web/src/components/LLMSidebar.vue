@@ -1,77 +1,90 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const open = ref(false);
-const userMessages = ref<{[date: number]: string}>({});
-const llmMessages = ref<{[date: number]: string}>({0: "# Lorem Ipsum is \n\n\nsimply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
-  1: "*test*"
-});
-const messages = computed(() => {
-  const combinedMessages = {...userMessages.value, ...llmMessages.value};
-  return Object.keys(combinedMessages)
-    .sort((a, b) => Number(a) - Number(b))
-    .reduce((acc: any, key: any) => {
-      acc[key] = combinedMessages[key];
-      return acc;
-    }, {});
-});
+const userMessages = ref<{ [date: number]: string }>({});
+const llmMessages = ref<{ [date: number]: string }>({});
 const newMessage = ref('');
-
 const responseLoading = ref(false);
 
-const currentTime = computed(() => Date.now());
+const messages = computed(() => {
+  const combinedMessages = { ...userMessages.value, ...llmMessages.value };
+  return Object.keys(combinedMessages)
+    .sort((a, b) => Number(a) - Number(b))
+    .reduce((acc, key) => {
+      acc[key] = combinedMessages[key];
+      return acc;
+    }, {} as { [date: number]: string });
+});
 
 const scrollChatBox = (timeout: number = 100) => {
   setTimeout(() => {
-      const messageContainer = document.querySelector('.messages');
-      if (messageContainer) {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-      }
-    }, timeout);
-}
-
-async function sendMessageToLLM(message: string) {
-  // send message to LLM
-  // api call here (should be async)
-  // simulate response (TODO: actual response)
-  await new Promise((resolve, reject) => {
-    // TODO: simulated error
-    if (message === 'error') {
-      reject('Error message');
+    const messageContainer = document.querySelector('.messages');
+    if (messageContainer) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
-    setTimeout(() => {
-      llmMessages.value[currentTime.value] = "I'm a bot, you said: " + message;
-      resolve(true);
-    }, 2000);
-  });
+  }, timeout);
+};
+
+let websocket: WebSocket | null = null;
+
+async function initializeWebSocket() {
+  websocket = new WebSocket('ws://localhost:80/generate');
+
+  websocket.onopen = () => {
+    console.log('WebSocket connection established');
+  };
+
+  websocket.onmessage = (event) => {
+    const time = Date.now();
+    console.log('Received message:', event.data);
+    const msg = event.data.split("\n")
+    .filter(line => line.trim()) 
+    .map(line => JSON.parse(line).response)
+    .join("");
+    
+    llmMessages.value[time] = msg;
+    scrollChatBox();
+  };
+
+  websocket.onerror = (error) => {
+    console.error('WebSocket error:', error);
+    llmMessages.value[Date.now()] = 'WebSocket encountered an error.';
+  };
+
+  websocket.onclose = () => {
+    console.log('WebSocket connection closed');
+    llmMessages.value[Date.now()] = 'Connection closed.';
+  };
 }
 
-// TODO: implement API call to LLM
 async function sendMessage() {
   if (newMessage.value.trim() !== '') {
-    // Create a new message object in order to clear the chatbox (looks better when sending)
     const m = newMessage.value;
     newMessage.value = '';
-    userMessages.value[currentTime.value] = (m);
-    // Scroll to the bottom of the messages
+    userMessages.value[Date.now()] = m;
     scrollChatBox();
 
-    // send message to LLM
-    // api call here (should be async)
     responseLoading.value = true;
 
-    sendMessageToLLM(m).then(() => {
-      console.log('Message sent to LLM');
+    try {
+      if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send(m);
+      } else {
+        throw new Error('WebSocket is not connected');
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      llmMessages.value[Date.now()] = 'Failed to send message to server.';
+    } finally {
       responseLoading.value = false;
-      scrollChatBox();
-    }).catch((error) => {
-      console.error('Failed to send message to LLM:', error);
-      llmMessages.value[currentTime.value] = "There was an error loading a response...";
-      responseLoading.value = false;
-    });
+    }
   }
-};
+}
+
+initializeWebSocket();
 </script>
+
 
 <template>
   <v-navigation-drawer

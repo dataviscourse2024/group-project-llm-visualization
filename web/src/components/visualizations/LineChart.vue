@@ -174,11 +174,13 @@ watch(() => props.data, drawChart);
   overflow-y: auto; /* Enable vertical scrolling */
   margin-top: 20px;
   width: 100%;
+  position: relative;
 }
 
 table {
   border-collapse: collapse;
   width: 100%;
+  margin: 0;
 }
 
 th, td {
@@ -189,5 +191,24 @@ th, td {
 th {
   border: 1px solid #ddd;
   text-align: left;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-image: linear-gradient(to right, #ffffff, #f7f7f7); 
+}
+.v-theme--dark thead {
+  background-image: linear-gradient(to right, #333333, #444444); 
+}
+
+tr:nth-child(even) {
+  background-image: linear-gradient(to right, #f2f2f2, #e0e0e0); 
+}
+
+.v-theme--dark tr:nth-child(even) {
+  background-image: linear-gradient(to right, #444444, #555555); 
 }
 </style>
