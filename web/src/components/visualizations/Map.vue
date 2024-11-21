@@ -36,7 +36,6 @@ const chart = ref(null);
 const selectedData = reactive([]);
 const formatDate = (time) => d3.timeFormat("%B %d, %Y")(new Date(time));
 const formatTime = (time) => d3.timeFormat("%H:%M:%S")(new Date(time));
-
 const reversedSelectedData = computed(() => [...selectedData].reverse());
 
 const drawMap = () => {
@@ -66,15 +65,23 @@ const drawMap = () => {
     .attr('fill', '#ccc')
     .attr('stroke', '#333');
 
+  const brush = d3.brush()
+    .extent([[0, 0], [width, height]])
+    .on('end', brushed);
+
+  svg.append('g')
+    .attr('class', 'brush')
+    .call(brush);
+
   // Draw the points
   svg.selectAll('circle')
     .data(props.data)
     .enter()
     .append('circle')
-    .attr('cx', (d) => projection([d.longitude, d.latitude])[0])
-    .attr('cy', (d) => projection([d.longitude, d.latitude])[1])
+    .attr('cx', (d) => projection([d.coordinates[0], d.coordinates[1]])[0])
+    .attr('cy', (d) => projection([d.coordinates[0], d.coordinates[1]])[1])
     .attr('r', 5)
-    .attr('fill', 'red')
+    .attr('fill', 'steelblue')
     .on('mouseover', (event, d) => {
       tooltip.transition().duration(200).style('opacity', 1);
       tooltip.html(`Date: ${formatDate(d.time)}<br>Magnitude: ${d.magnitude}<br>Location: ${d.location}<br>Time: ${formatTime(d.time)}`)
@@ -84,7 +91,7 @@ const drawMap = () => {
     })
     .on('mouseout', function () {
       tooltip.transition().duration(500).style('opacity', 0);
-      d3.select(this).attr('fill', 'red');
+      d3.select(this).attr('fill', 'steelblue');
     });
 
   const tooltip = d3.select(chart.value).append('div')
@@ -103,14 +110,6 @@ const drawMap = () => {
       }
     });
 
-  const brush = d3.brush()
-    .extent([[0, 0], [width, height]])
-    .on('end', brushed);
-
-  svg.append('g')
-    .attr('class', 'brush')
-    .call(brush);
-
   function brushed(event) {
     if (!event.selection) {
       selectedData.splice(0, selectedData.length); // Clear the table when brush is out of focus
@@ -118,7 +117,7 @@ const drawMap = () => {
     }
     const [[x0, y0], [x1, y1]] = event.selection;
     const brushedData = props.data.filter(d => {
-      const [cx, cy] = projection([d.longitude, d.latitude]);
+      const [cx, cy] = projection([d.coordinates[0], d.coordinates[1]]);
       return cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
     });
     selectedData.splice(0, selectedData.length, ...brushedData);
@@ -143,6 +142,7 @@ onMounted(drawMap);
   max-height: 200px; /* Set the maximum height for the table container */
   overflow-y: auto; /* Enable vertical scrolling */
   margin-top: 20px;
+  width: 100%;
 }
 
 table {
