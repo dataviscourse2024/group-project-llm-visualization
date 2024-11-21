@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useTheme } from 'vuetify'
+import { useTheme } from 'vuetify';
+import { currentView } from './state'; // Import the global ref
 
 const open = ref(false);
 const theme = useTheme();
@@ -9,13 +10,18 @@ const toggleTheme = async () => {
   theme.global.name.value = theme.global.name.value === 'light' ? 'dark' : 'light';
 };
 
+const switchToLineChart = () => {
+  currentView.value = 'lineChart';
+};
+
+const switchToMap = () => {
+  currentView.value = 'map';
+};
+
 </script>
 
 <template>
-  <v-navigation-drawer
-    v-model="open"
-    app
-  >
+  <v-navigation-drawer v-model="open" app>
     <v-switch
       @change="toggleTheme"
       class="theme-toggle-switch d-flex justify-center"
@@ -25,6 +31,8 @@ const toggleTheme = async () => {
         <v-icon right>mdi-weather-night</v-icon>
       </template>
     </v-switch>
+    <v-btn @click="switchToLineChart">Line Chart</v-btn>
+    <v-btn @click="switchToMap">Map</v-btn>
   </v-navigation-drawer>
   <v-btn
     :class="[ 'toggle-btn', open ? 'open' : '' ]"
