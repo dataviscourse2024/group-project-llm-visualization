@@ -1,4 +1,4 @@
 # Install docker and execute the following commands
 
 docker build -t viz_api .
-docker run -d --name api_container -p 80:80 viz_api
+docker run -d --name api_container -p 80:80 -p 11434:11434 viz_api
