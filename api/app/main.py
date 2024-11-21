@@ -35,6 +35,7 @@ class TimeStamp(BaseModel):
 def get_earthquake_data(url):
     with urlopen(url) as response:
         data = response.read()
+        print(json.loads(data))
         return json.loads(data)
 
 
@@ -46,6 +47,7 @@ def filter(json_data):
             {
                 "id": id_,
                 "type": feature["properties"]["type"].lower(),
+                "coordinates": feature["geometry"]["coordinates"],
                 "magnitude": feature["properties"]["mag"],
                 "location": feature["properties"]["place"],
                 "time": datetime.datetime.utcfromtimestamp(
@@ -100,7 +102,7 @@ async def get_data(timestamp: TimeStamp):
     if res["metadata"]["status"] == 200:
         print("successfully scraped data")
         filtered_data = filter(res)
-        print(filtered_data)
+        #print(filtered_data)
         return filtered_data
         # return res
     else:
