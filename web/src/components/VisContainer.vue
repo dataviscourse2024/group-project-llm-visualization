@@ -5,7 +5,7 @@
         <v-row class="fill-height">
           <component :is="currentViewComponent" :data="filteredChartData" />
         </v-row>
-        <v-row v-if="currentView.value === 'lineChart'">
+        <v-row v-if="currentView === 'lineChart'">
           <TimeSlider :data="chartData" @updateWindow="updateWindow" />
         </v-row>
         <v-row>

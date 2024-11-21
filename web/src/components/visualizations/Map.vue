@@ -23,10 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, computed } from 'vue';
+import { onMounted, watch, ref, reactive, computed } from 'vue';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
-import utahTopoJson from './utah.json'; // Import the TopoJSON file for Utah
+import utahTopoJson from './utah-districts.json'; // Import the TopoJSON file for Utah
 
 const props = defineProps({
   data: Array,
@@ -41,6 +41,7 @@ const reversedSelectedData = computed(() => [...selectedData].reverse());
 const drawMap = () => {
   const width = 800;
   const height = 600;
+  d3.select(chart.value).selectAll('*').remove();
 
   const svg = d3.select(chart.value)
     .append('svg')
@@ -58,7 +59,8 @@ const drawMap = () => {
 
   // Draw the map of Utah
   g.selectAll('path')
-    .data(topojson.feature(utahTopoJson, utahTopoJson.objects.utah).features)
+    // .data(topojson.feature(utahTopoJson, utahTopoJson.objects.utah).features)
+    .data(topojson.feature(utahTopoJson, utahTopoJson.objects["utah-districts"]).features)
     .enter()
     .append('path')
     .attr('d', path)
@@ -125,12 +127,16 @@ const drawMap = () => {
 };
 
 onMounted(drawMap);
+watch(() => props.data, drawMap);
 </script>
 
 <style scoped>
 .chart {
   width: 100%;
   height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .tooltip {
@@ -158,5 +164,7 @@ th, td {
 th {
   background-color: #f2f2f2;
   text-align: left;
+  position: sticky;
+  top: 0;
 }
 </style>

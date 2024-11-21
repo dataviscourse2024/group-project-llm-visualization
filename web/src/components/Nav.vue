@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
-import { currentView } from './state'; // Import the global ref
+import { currentView, currentTheme } from './state'; // Import the global ref
 
 const open = ref(false);
 const theme = useTheme();
@@ -31,8 +31,10 @@ const switchToMap = () => {
         <v-icon right>mdi-weather-night</v-icon>
       </template>
     </v-switch>
-    <v-btn @click="switchToLineChart">Line Chart</v-btn>
-    <v-btn @click="switchToMap">Map</v-btn>
+    <div class="button-container">
+      <v-btn class="custom-btn line-chart-btn" @click="switchToLineChart">Line Chart</v-btn>
+      <v-btn class="custom-btn map-btn" @click="switchToMap">Map</v-btn>
+    </div>
   </v-navigation-drawer>
   <v-btn
     :class="[ 'toggle-btn', open ? 'open' : '' ]"
@@ -64,5 +66,23 @@ const switchToMap = () => {
   .toggle-btn.open {
     left: 250px; 
   }
-  
+  .button-container {
+    display: flex;
+    flex-direction: column; /* Arrange buttons vertically */
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Add space between buttons */
+    margin-top: 20px; /* Add some margin at the top */
+  }
+  .custom-btn {
+    width: 90%; /* Ensure buttons take full width */
+  }
+  .line-chart-btn {
+    background-color: #4caf50; /* Green background for Line Chart button */
+    color: white; /* White text color */
+  }
+  .map-btn {
+    background-color: #2196f3; /* Blue background for Map button */
+    color: white; /* White text color */
+  }
 </style>
