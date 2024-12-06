@@ -29,7 +29,10 @@ docker run -d --name api_container -p 80:80 viz_api
 ```
 cd web 
 docker build -t viz_ui .
-docker run -d --name ui_container -p 5173:5173 viz_ui  
-```
+docker run -d --name api_container -p 80:80 viz_api
 
-Open [http://localhost:5173/](http://localhost:5173/) once both the containers are up. 
+:q
+çç:qnpm install -g yarn 
+yarn install 
+yarn dev 
+```
