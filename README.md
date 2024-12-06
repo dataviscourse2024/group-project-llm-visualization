@@ -8,6 +8,13 @@ Tin Vo; u1289616; u1289616@utah.edu
 Install [Docker](https://www.docker.com/products/docker-desktop/) execute the following commands. 
 
 
+## Data
+
+An API is used to grab data from: https://earthquake.usgs.gov/earthquakes/map/
+
+The range of the data is taken by drawing a rectangle around Utah on the map.
+
+
 ## Disclaimer 
 
 Peak Performance can be achieved on an M1 mac or newer, or a GPU workstation. 
