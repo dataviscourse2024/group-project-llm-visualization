@@ -8,6 +8,21 @@ Tin Vo; u1289616; u1289616@utah.edu
 Install [Docker](https://www.docker.com/products/docker-desktop/) execute the following commands. 
 
 
+## Overview
+
+Frontend is made using Vue and Vuetify for some styling of common components, along with D3. Vite was used for building/running the frontend.
+
+The geojson used for the map was obtained from here: https://gist.github.com/tomshanley/a006f9c6c4b30835137ead7574a51d17#file-utah-districts-geojson
+
+The code in the /web folder is some setup code from Vue/Vuetify and mostly our code.
+
+The code in the /web/components are basically all the components that can be seen on a browser when the project is ran.
+
+The code in the /api folder is our code (using fastapi) which pulls earthquake data from the website given below.
+
+View the screencast here: https://www.youtube.com/watch?v=SErroFogMmk
+
+
 ## Data
 
 An API is used to grab data from: https://earthquake.usgs.gov/earthquakes/map/
