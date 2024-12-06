@@ -14,11 +14,9 @@ Frontend is made using Vue and Vuetify for some styling of common components, al
 
 The geojson used for the map was obtained from here: https://gist.github.com/tomshanley/a006f9c6c4b30835137ead7574a51d17#file-utah-districts-geojson
 
-The code in the /web folder is some setup code from Vue/Vuetify and mostly our code.
+The code in the `/web` folder uses the Vue3 framework for componentization and responsiveness. There are some components that come from Vuetify, a Vue plugin which utilizes Material UI to pre-style common components. Custom components can be found in `/web/components`. This includes the `VisContainer`, all visualizations, sidebars, etc. All frontend code is written by us, leveraging these frameworks/plugins.
 
-The code in the /web/components are basically all the components that can be seen on a browser when the project is ran.
-
-The code in the /api folder is our code (using fastapi) which pulls earthquake data from the website given below.
+The code in the `/api` folder is our code (using fastapi) which pulls earthquake data from the website given below.
 
 View the screencast here: https://www.youtube.com/watch?v=SErroFogMmk
 
