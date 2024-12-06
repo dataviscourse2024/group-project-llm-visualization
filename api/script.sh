@@ -1,5 +1,24 @@
 #!/bin/bash
 
+
+# For a clean install uncomment this.
+# if brew services list | grep -q ollama; then
+#   echo "Stopping existing Ollama service..."
+#   brew services stop ollama
+# fi
+
+# if [ -d "$APP_DIR/homebrew" ]; then    
+#   echo "Removing existing Homebrew installation..."
+#   rm -rf "$APP_DIR/homebrew"
+# fi
+
+# if [ -f "$BREW_BIN/ollama" ]; then    
+#   echo "Removing existing Ollama binary..."        
+#   rm -f "$BREW_BIN/ollama"  
+# fi
+
+
+
 USER_HOME="$HOME"
 APP_DIR="$USER_HOME/Applications"
 BREW_BIN="$USER_HOME/Applications/homebrew/bin"
@@ -26,12 +45,12 @@ source ~/.bash_profile
 brew services start ollama
 
 # Run Ollama server and model
-OLLAMA_HOST=$OLLAMA_HOST ./ollama serve
-ollama run $OLLAMA_MODEL
+OLLAMA_HOST=$OLLAMA_HOST ollama serve
+ollama run $OLLAMA_MODEL <<< "/bye"
 
 # Sample Response
-curl -X POST http://localhost:11434/api/generate -d "{
-  \"model\": \"$OLLAMA_MODEL\",
-  \"prompt\": \"$PROMPT\"
-}"
+curl -X POST http://0.0.0.0:11434/api/generate -d '{
+  "model": "$OLLAMA_MODEL",
+  "prompt": "$PROMPT"
+}'
 
